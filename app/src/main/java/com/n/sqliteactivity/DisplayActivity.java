@@ -1,8 +1,11 @@
 package com.n.sqliteactivity;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -15,6 +18,7 @@ import model.Word;
 
 public class DisplayActivity extends AppCompatActivity {
     private ListView lstWords;
+    HashMap<String,String> hashMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +27,19 @@ public class DisplayActivity extends AppCompatActivity {
 
         lstWords = findViewById(R.id.lstWords);
         loadWord();
+
+        lstWords.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String key = parent.getItemAtPosition(position).toString();
+                String meaning = hashMap.get(key);
+
+
+                Intent intent = new Intent(DisplayActivity.this,MeaningActivity.class);
+                intent.putExtra("meaning",meaning);
+                startActivity(intent);
+            }
+        });
     }
     private void loadWord(){
         final MyHelper myHelper = new MyHelper(this);
@@ -31,7 +48,7 @@ public class DisplayActivity extends AppCompatActivity {
         List<Word> wordList = new ArrayList<>();
         wordList = myHelper.GetAllWords(sqLiteDatabase);
 
-        HashMap<String,String> hashMap = new HashMap<>();
+
         for (int i=0;i<wordList.size();i++){
             hashMap.put(wordList.get(i).getWord(),wordList.get(i).getMeaning());
         }
